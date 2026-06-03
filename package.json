@@ -2,6 +2,7 @@
   "name": "withinrange",
   "version": "1.0.0",
   "main": "index.ts",
+  "license": "UNLICENSED",
   "dependencies": {
     "@bacons/apple-targets": "^4.0.7",
     "@expo/vector-icons": "^15.0.2",

@@ -143,3 +143,9 @@ anomaly detection (mass-hellos, rapid re-registration, report clusters).
 - [ ] `BleProximity` real Bluetooth provider (local-first / offline-capable)
 - [ ] Consent-handshake backend + push notifications
 - [ ] Safety v2: verification, device attestation, age-gating, anomaly detection
+
+## License
+
+© 2026 Ingeun Yun. **All rights reserved** — proprietary; see [LICENSE](LICENSE).
+This source is public for viewing only. No permission is granted to use, copy,
+modify, or redistribute it without prior written permission.
