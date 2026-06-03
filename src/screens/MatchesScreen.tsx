@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FlatList, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Photo } from '../components/Photo';
 import { SafetyMenu } from '../components/SafetyMenu';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useStore } from '../store';
 import { colors, font, radius, space } from '../theme';
 import { MatchReveal, NearbyPeer } from '../types';
@@ -56,7 +57,10 @@ export function MatchesScreen() {
               <View style={styles.row}>
                 <Photo photoUri={item.photoUri} avatar={item.avatar} size={52} />
                 <View style={styles.rowText}>
-                  <Text style={styles.name}>{item.displayName}</Text>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.name}>{item.displayName}</Text>
+                    <VerifiedBadge verified={item.verified} size={15} />
+                  </View>
                   <Pressable
                     onPress={() => openInstagram(item)}
                     disabled={item.demo}
@@ -142,6 +146,7 @@ const styles = StyleSheet.create({
     padding: space.md,
   },
   rowText: { flex: 1 },
+  nameRow: { flexDirection: 'row', alignItems: 'center' },
   name: { fontSize: font.body, fontWeight: '600', color: colors.text },
   handle: { fontSize: font.small, color: colors.accent, fontWeight: '600', marginTop: 1 },
   nearbyNote: { fontSize: font.small, color: colors.success, marginTop: 2, fontWeight: '600' },

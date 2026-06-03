@@ -3,12 +3,18 @@ import { MatchReveal, MyProfile, NearbyPeer } from './types';
 
 export type Report = { peerId: string; reason: string; at: number };
 
+// Anti-spam: at most this many hellos within the rolling window.
+export const HELLO_LIMIT = 8;
+export const HELLO_WINDOW_MS = 5 * 60 * 1000;
+
 export type AppState = {
-  phase: 'onboarding' | 'main';
+  phase: 'agegate' | 'onboarding' | 'main';
   profile: MyProfile | null;
   isOpen: boolean; // am I discoverable right now?
+  verifiedOnly: boolean; // only let verified people say hi to me
   peers: NearbyPeer[];
   sentHellos: string[]; // peerIds I've said hi to (waiting, never "rejected")
+  helloTimes: number[]; // timestamps of recent hellos (rate limiting)
   incoming: NearbyPeer | null; // an incoming hello awaiting my response
   match: MatchReveal | null; // a fresh mutual match to celebrate
   matches: MatchReveal[]; // everyone I've mutually matched — gates the finder
@@ -17,11 +23,13 @@ export type AppState = {
 };
 
 export const initialState: AppState = {
-  phase: 'onboarding',
+  phase: 'agegate', // 18+ gate comes first
   profile: null,
   isOpen: true,
+  verifiedOnly: false,
   peers: [],
   sentHellos: [],
+  helloTimes: [],
   incoming: null,
   match: null,
   matches: [],
@@ -29,9 +37,17 @@ export const initialState: AppState = {
   reports: [],
 };
 
+// Hellos sent within the rolling window — used to enforce HELLO_LIMIT.
+export function recentHelloCount(times: number[], now = Date.now()): number {
+  return times.filter((t) => now - t < HELLO_WINDOW_MS).length;
+}
+
 export type Action =
+  | { type: 'COMPLETE_AGEGATE' }
   | { type: 'COMPLETE_ONBOARDING'; profile: MyProfile }
   | { type: 'UPDATE_PROFILE'; profile: MyProfile }
+  | { type: 'VERIFY_ME' }
+  | { type: 'SET_VERIFIED_ONLY'; value: boolean }
   | { type: 'SET_OPEN'; value: boolean }
   | { type: 'PEERS_CHANGED'; peers: NearbyPeer[] }
   | { type: 'SAY_HI'; peerId: string }
@@ -44,11 +60,20 @@ export type Action =
 
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
+    case 'COMPLETE_AGEGATE':
+      return { ...state, phase: 'onboarding' };
+
     case 'COMPLETE_ONBOARDING':
       return { ...state, phase: 'main', profile: action.profile, isOpen: true };
 
     case 'UPDATE_PROFILE':
       return { ...state, profile: action.profile };
+
+    case 'VERIFY_ME':
+      return state.profile ? { ...state, profile: { ...state.profile, verified: true } } : state;
+
+    case 'SET_VERIFIED_ONLY':
+      return { ...state, verifiedOnly: action.value };
 
     case 'SET_OPEN':
       // Turning off makes me invisible and clears the room I was seeing.
@@ -69,11 +94,17 @@ export function reducer(state: AppState, action: Action): AppState {
 
     case 'SAY_HI':
       if (state.sentHellos.includes(action.peerId)) return state;
-      return { ...state, sentHellos: [...state.sentHellos, action.peerId] };
+      return {
+        ...state,
+        sentHellos: [...state.sentHellos, action.peerId],
+        helloTimes: [...state.helloTimes, Date.now()],
+      };
 
     case 'INCOMING_HELLO':
       // Only surface one at a time; ignore if I'm already looking at one.
       if (state.incoming) return state;
+      // If I've chosen verified-only, silently drop hellos from unverified people.
+      if (state.verifiedOnly && !action.peer.verified) return state;
       return { ...state, incoming: action.peer };
 
     case 'DISMISS_INCOMING':

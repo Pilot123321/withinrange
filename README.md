@@ -140,9 +140,12 @@ anomaly detection (mass-hellos, rapid re-registration, report clusters).
 - [x] Network-flow discovery map + customizable profile (photo, bio, avatar)
 - [x] AirTag-style finder (compass arrow), gated behind a mutual match
 - [x] Safety v1: report/block everywhere + mutual invisibility
+- [x] Safety v2 (client): 18+ age gate, verification badges + verified-only,
+      hello rate-limiting
 - [ ] `BleProximity` real Bluetooth provider (local-first / offline-capable)
 - [ ] Consent-handshake backend + push notifications
-- [ ] Safety v2: verification, device attestation, age-gating, anomaly detection
+- [ ] Safety v2 (server): real selfie verification, device attestation,
+      anomaly detection (needs a backend / native dev build)
 
 ## License
 

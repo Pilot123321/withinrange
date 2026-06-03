@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -6,6 +8,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from 'react-native';
@@ -13,7 +16,7 @@ import { ProfileForm } from '../components/ProfileForm';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { useStore } from '../store';
 import { MyProfile } from '../types';
-import { colors, font, space } from '../theme';
+import { colors, font, radius, space } from '../theme';
 
 // Edit your profile any time. Opens from the header avatar in the network view.
 export function ProfileEditor({ visible, onClose }: { visible: boolean; onClose: () => void }) {
@@ -39,6 +42,7 @@ export function ProfileEditor({ visible, onClose }: { visible: boolean; onClose:
           <View style={{ width: 56 }} />
         </View>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <VerificationSection />
           <ProfileForm draft={draft} onChange={(patch) => setDraft((d) => (d ? { ...d, ...patch } : d))} />
           <PrimaryButton
             label="Save"
@@ -63,8 +67,70 @@ export function ProfileEditor({ visible, onClose }: { visible: boolean; onClose:
   );
 }
 
+// Verification + the "verified-only" preference. Verification is simulated for
+// the prototype: in production the selfie is checked for liveness and matched to
+// your profile photo by a backend before the badge is granted.
+function VerificationSection() {
+  const { state, dispatch } = useStore();
+  const verified = !!state.profile?.verified;
+
+  async function verify() {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.6,
+    });
+    if (!result.canceled) dispatch({ type: 'VERIFY_ME' }); // real flow: send selfie to backend
+  }
+
+  return (
+    <View style={styles.vCard}>
+      {verified ? (
+        <View style={styles.vRow}>
+          <Ionicons name="checkmark-circle" size={26} color={colors.accent} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.vTitle}>You're verified</Text>
+            <Text style={styles.vSub}>People can trust your photo is really you.</Text>
+          </View>
+        </View>
+      ) : (
+        <Pressable style={styles.vRow} onPress={verify} accessibilityRole="button" accessibilityLabel="Get verified">
+          <Ionicons name="shield-checkmark-outline" size={26} color={colors.primary} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.vTitle}>Get verified</Text>
+            <Text style={styles.vSub}>Take a quick selfie to earn a verified badge (simulated here).</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textSoft} />
+        </Pressable>
+      )}
+
+      <View style={styles.divider} />
+
+      <View style={styles.vRow}>
+        <Ionicons name="lock-closed-outline" size={22} color={colors.textSoft} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.vTitle}>Only verified people can say hi</Text>
+          <Text style={styles.vSub}>Hellos from unverified people are quietly hidden.</Text>
+        </View>
+        <Switch
+          value={state.verifiedOnly}
+          onValueChange={(v) => dispatch({ type: 'SET_VERIFIED_ONLY', value: v })}
+          trackColor={{ true: colors.accent, false: colors.border }}
+          accessibilityLabel="Only verified people can say hi"
+        />
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: colors.bg },
+  vCard: { backgroundColor: colors.surface, borderRadius: radius.md, padding: space.md, gap: space.sm },
+  vRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  vTitle: { fontSize: font.body, fontWeight: '600', color: colors.text },
+  vSub: { fontSize: font.small, color: colors.textSoft, marginTop: 1 },
+  divider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border, marginVertical: space.xs },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

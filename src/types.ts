@@ -18,6 +18,7 @@ export type MyProfile = {
   bio: string; // 2–3 lines, anonymous "vibe" shown before any match
   // Real identity — revealed ONLY after a mutual match, never while browsing.
   photoUri?: string; // customizable profile photo (local image uri)
+  verified: boolean; // passed selfie verification (a trust signal, anti-catfish)
 };
 
 // A person detected nearby — intentionally anonymous. No name, no photo,
@@ -26,6 +27,7 @@ export type NearbyPeer = {
   id: string; // ephemeral/rotating id
   displayName: string; // real first name, shown up front to build trust
   photoUri?: string; // real photo if set; otherwise the emoji avatar shows
+  verified: boolean; // shows a verified badge; a trust/anti-catfish signal
   alias: string;
   avatar: AvatarSpec; // emoji avatar — the photo fallback
   bio: string; // short vibe — a signal to help you decide to say hi
@@ -49,6 +51,7 @@ export type MatchReveal = {
   displayName: string;
   instagram: string;
   bio: string;
+  verified: boolean;
   photoUri?: string; // real profile photo, revealed with the rest on a match
   // True for simulated peers: handle is fake, so we MUST NOT deep-link to a
   // real instagram.com profile (it could belong to an uninvolved stranger).

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { NetworkGraph } from '../components/NetworkGraph';
 import { Photo } from '../components/Photo';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useStore } from '../store';
 import { colors, font, radius, space } from '../theme';
 import { NearbyPeer } from '../types';
@@ -58,7 +59,10 @@ export function NearbyScreen({ onSayHi }: { onSayHi: (peerId: string) => void })
       >
         <Photo photoUri={profile.photoUri} avatar={profile.avatar} size={40} />
         <View style={styles.profileText}>
-          <Text style={styles.meName}>{profile.displayName || 'You'}</Text>
+          <View style={styles.meNameRow}>
+            <Text style={styles.meName}>{profile.displayName || 'You'}</Text>
+            <VerifiedBadge verified={profile.verified} size={15} />
+          </View>
           <Text style={styles.meEdit}>Edit profile</Text>
         </View>
         <Ionicons name="chevron-forward" size={18} color={colors.textSoft} />
@@ -139,6 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   profileText: { flex: 1 },
+  meNameRow: { flexDirection: 'row', alignItems: 'center' },
   meName: { fontSize: font.body, fontWeight: '600', color: colors.text },
   meEdit: { fontSize: font.small, color: colors.textSoft },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: space.sm },

@@ -1,16 +1,17 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { TabBar, TabKey } from './src/components/TabBar';
 import { ProximityProvider } from './src/proximity/ProximityProvider';
 import { SimulatedProximity } from './src/proximity/SimulatedProximity';
+import { AgeGateScreen } from './src/screens/AgeGateScreen';
 import { IncomingHello } from './src/screens/IncomingHello';
 import { MatchesScreen } from './src/screens/MatchesScreen';
 import { MatchOverlay } from './src/screens/MatchOverlay';
 import { NearbyScreen } from './src/screens/NearbyScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
-import { initialState, reducer, StoreContext } from './src/store';
+import { HELLO_LIMIT, initialState, recentHelloCount, reducer, StoreContext } from './src/store';
 import { colors } from './src/theme';
 import { publishWidgetState } from './src/widget';
 
@@ -48,7 +49,9 @@ export default function App() {
       <StoreContext.Provider value={store}>
         <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
           <StatusBar style="dark" />
-        {state.phase === 'onboarding' ? (
+        {state.phase === 'agegate' ? (
+          <AgeGateScreen />
+        ) : state.phase === 'onboarding' ? (
           <OnboardingScreen />
         ) : (
           <View style={styles.flex}>
@@ -56,6 +59,14 @@ export default function App() {
               {tab === 'nearby' ? (
                 <NearbyScreen
                   onSayHi={(peerId) => {
+                    // Anti-spam: cap how many hellos you can fire off in a window.
+                    if (recentHelloCount(state.helloTimes) >= HELLO_LIMIT) {
+                      Alert.alert(
+                        'Slow down a little 💛',
+                        "You've said hi to a lot of people in a short time. Take a breath and try again in a few minutes."
+                      );
+                      return;
+                    }
                     dispatch({ type: 'SAY_HI', peerId });
                     provider.current.sayHi(peerId);
                   }}

@@ -5,6 +5,7 @@ import { Photo } from '../components/Photo';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SafetyMenu } from '../components/SafetyMenu';
 import { Sheet } from '../components/Sheet';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { colors, font, radius, space } from '../theme';
 import { closenessLabel, MatchReveal, NearbyPeer } from '../types';
 
@@ -37,7 +38,10 @@ export function PeerDetailSheet({
       {peer && (
         <View style={styles.body}>
           <Photo photoUri={peer.photoUri} avatar={peer.avatar} size={88} />
-          <Text style={styles.name}>{peer.displayName}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>{peer.displayName}</Text>
+            <VerifiedBadge verified={peer.verified} size={18} />
+          </View>
           <View style={styles.closenessRow}>
             <Ionicons name="location" size={14} color={colors.textSoft} />
             <Text style={styles.closeness}>{closenessLabel[peer.closeness]}</Text>
@@ -89,7 +93,8 @@ export function PeerDetailSheet({
 
 const styles = StyleSheet.create({
   body: { alignItems: 'center', gap: space.sm, alignSelf: 'stretch' },
-  name: { fontSize: font.title, fontWeight: '700', color: colors.text, marginTop: space.sm },
+  nameRow: { flexDirection: 'row', alignItems: 'center', marginTop: space.sm },
+  name: { fontSize: font.title, fontWeight: '700', color: colors.text },
   closenessRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   closeness: { fontSize: font.small, color: colors.textSoft },
   bio: { fontSize: font.body, color: colors.text, textAlign: 'center', lineHeight: 24, marginVertical: space.sm },

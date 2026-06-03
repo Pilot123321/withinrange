@@ -9,7 +9,7 @@ import { colors, font, space } from '../theme';
 
 function emptyProfile(): MyProfile {
   const { alias, avatar } = makeAlias();
-  return { displayName: '', instagram: '', bio: '', alias, avatar, photoUri: undefined };
+  return { displayName: '', instagram: '', bio: '', alias, avatar, photoUri: undefined, verified: false };
 }
 
 export function OnboardingScreen() {

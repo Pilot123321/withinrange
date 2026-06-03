@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Photo } from '../components/Photo';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Sheet } from '../components/Sheet';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { colors, font, space } from '../theme';
 import { NearbyPeer } from '../types';
 
@@ -20,7 +21,10 @@ export function IncomingHello({
     <Sheet visible={!!peer} onClose={onDismiss}>
       <View style={styles.body}>
         {peer && <Photo photoUri={peer.photoUri} avatar={peer.avatar} size={72} />}
-        <Text style={styles.title}>{peer?.displayName} said hi 👋</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{peer?.displayName} said hi 👋</Text>
+          <VerifiedBadge verified={!!peer?.verified} size={18} />
+        </View>
         {!!peer?.bio && <Text style={styles.bio}>{peer.bio}</Text>}
         <Text style={styles.copy}>
           If you're open to it, you'll both get each other's Instagram. If not, just tap “Not now” — they'll
@@ -35,6 +39,7 @@ export function IncomingHello({
 
 const styles = StyleSheet.create({
   body: { alignItems: 'center', gap: space.md, alignSelf: 'stretch' },
+  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: font.title, fontWeight: '700', color: colors.text, textAlign: 'center' },
   bio: { fontSize: font.body, color: colors.textSoft, textAlign: 'center', lineHeight: 24 },
   copy: { fontSize: font.body, color: colors.textSoft, textAlign: 'center', lineHeight: 24 },

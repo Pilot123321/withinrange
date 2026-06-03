@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, Line } from 'react-native-svg';
@@ -142,7 +143,14 @@ export function NetworkGraph({
               accessibilityLabel={`${peer.displayName}, ${peer.closeness.replace(/-/g, ' ')}${sent ? ', hi sent' : ''}`}
               style={[styles.node, { left: x - NODE / 2, top: y - NODE / 2 }]}
             >
-              <Photo photoUri={peer.photoUri} avatar={peer.avatar} size={NODE} />
+              <View>
+                <Photo photoUri={peer.photoUri} avatar={peer.avatar} size={NODE} />
+                {peer.verified && (
+                  <View style={styles.nodeBadge}>
+                    <Ionicons name="checkmark-circle" size={18} color={colors.accent} />
+                  </View>
+                )}
+              </View>
               <Text style={styles.name} numberOfLines={1}>
                 {peer.displayName}
               </Text>
@@ -158,6 +166,13 @@ export function NetworkGraph({
 const styles = StyleSheet.create({
   canvas: { flex: 1, overflow: 'hidden' },
   node: { position: 'absolute', width: NODE, alignItems: 'center' },
+  nodeBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: colors.bg,
+    borderRadius: 10,
+  },
   meHalo: {
     borderRadius: NODE,
     borderWidth: 3,

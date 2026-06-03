@@ -3,6 +3,7 @@ import { Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { Photo } from '../components/Photo';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SafetyMenu } from '../components/SafetyMenu';
+import { VerifiedBadge } from '../components/VerifiedBadge';
 import { useStore } from '../store';
 import { colors, font, radius, space } from '../theme';
 import { MatchReveal } from '../types';
@@ -38,7 +39,10 @@ export function MatchOverlay({
 
           {match && (
             <>
-              <Text style={styles.name}>{match.displayName}</Text>
+              <View style={styles.nameRow}>
+                <Text style={styles.name}>{match.displayName}</Text>
+                <VerifiedBadge verified={match.verified} size={20} />
+              </View>
               {!!match.bio && <Text style={styles.bio}>{match.bio}</Text>}
 
               {match.demo ? (
@@ -109,6 +113,7 @@ const styles = StyleSheet.create({
   kicker: { fontSize: font.title, fontWeight: '800', color: colors.accent },
   avatars: { flexDirection: 'row', alignItems: 'center', gap: space.md, marginVertical: space.sm },
   plus: { fontSize: font.title, color: colors.textSoft, fontWeight: '700' },
+  nameRow: { flexDirection: 'row', alignItems: 'center' },
   name: { fontSize: font.display, fontWeight: '800', color: colors.text },
   bio: { fontSize: font.body, color: colors.textSoft, textAlign: 'center', lineHeight: 24, marginBottom: space.xs },
   handlePill: {

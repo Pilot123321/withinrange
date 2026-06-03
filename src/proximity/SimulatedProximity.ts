@@ -105,6 +105,7 @@ function makeSimPeer(): SimPeer {
       alias,
       avatar: { emoji: EMOJIS[i], color: pick(colors.avatarPalette) },
       bio: pick(BIOS),
+      verified: Math.random() < 0.6, // ~60% of demo people are verified
       bearing: Math.floor(Math.random() * 360),
       distanceM: trueDistanceM,
       closeness: closenessFor(trueDistanceM),
@@ -210,6 +211,7 @@ export class SimulatedProximity implements ProximityProvider {
       displayName: sp.realName,
       instagram: sp.instagram,
       bio: sp.peer.bio,
+      verified: sp.peer.verified,
       demo: true, // simulated handle — UI must not open instagram.com with it
     };
     this.handlers.onMatch(reveal);
