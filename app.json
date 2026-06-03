@@ -7,7 +7,11 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.withinrange.app",
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.com.withinrange.app"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +24,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "@bacons/apple-targets"
+    ]
   }
 }
