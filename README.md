@@ -56,10 +56,10 @@ UI (screens) ──> ProximityProvider (interface)
   declining is silent, only one incoming hello shown at a time).
 - `src/screens/` — Onboarding, Nearby, IncomingHello, MatchOverlay.
 
-## Next step: real 5-meter proximity (Bluetooth LE)
+## Next step: real 8-meter proximity (Bluetooth LE)
 
-Proximity within ~5m is the one thing a web app *cannot* do reliably (GPS is
-5–20m and useless indoors). The plan:
+Proximity within ~8m (the configured range) is the one thing a web app *cannot*
+do reliably (GPS is 5–20m and useless indoors). The plan:
 
 1. Each phone **advertises** a *rotating* anonymous id over BLE (rotating so no
    one can track you over time) and **scans** for others.

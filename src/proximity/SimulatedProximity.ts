@@ -81,11 +81,14 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+// Discovery range: people farther than this are out of range and not shown.
+export const MAX_RANGE_M = 8;
+
 // Distance bucket from rough metres — keeps the graph rings + copy soft.
 function closenessFor(distanceM: number): NearbyPeer['closeness'] {
-  if (distanceM <= 2) return 'right-here';
+  if (distanceM <= 2.5) return 'right-here';
   if (distanceM <= 5) return 'a-few-steps';
-  return 'nearby';
+  return 'nearby'; // 5–8 m
 }
 
 let counter = 0;
@@ -94,7 +97,7 @@ function makeSimPeer(): SimPeer {
   const i = Math.floor(Math.random() * ANIMALS.length);
   const alias = `${pick(ADJECTIVES)} ${ANIMALS[i]}`;
   const name = pick(NAMES);
-  const trueDistanceM = Math.round((0.8 + Math.random() * 8) * 10) / 10; // ~0.8–8.8 m
+  const trueDistanceM = Math.round((0.8 + Math.random() * (MAX_RANGE_M - 0.8)) * 10) / 10; // up to 8 m
   const caps = randomCaps();
   return {
     peer: {
@@ -223,7 +226,7 @@ export class SimulatedProximity implements ProximityProvider {
   private driftPeers() {
     if (this.peers.length === 0) return;
     for (const sp of this.peers) {
-      sp.trueDistanceM = Math.max(0.6, Math.min(9, sp.trueDistanceM + (Math.random() - 0.5)));
+      sp.trueDistanceM = Math.max(0.6, Math.min(MAX_RANGE_M, sp.trueDistanceM + (Math.random() - 0.5)));
       const bearing = (sp.peer.bearing + (Math.random() * 24 - 12) + 360) % 360;
 
       const est = sp.engine.update(sampleRadios(sp.trueDistanceM, sp.caps));
