@@ -1,5 +1,6 @@
 // Core domain types, shared across the app and the proximity layer.
 
+import { IntentTag } from './intents';
 import { RangingTech } from './ranging';
 
 export type AvatarSpec = {
@@ -22,6 +23,7 @@ export type SocialHandle = {
 export type MyProfile = {
   displayName: string;
   handles: SocialHandle[]; // the socials you offer to share
+  intents: IntentTag[]; // what you're open to — browsable/filterable by others
   alias: string; // friendly two-word alias others see, e.g. "Sky Otter"
   avatar: AvatarSpec;
   bio: string; // 2–3 lines, anonymous "vibe" shown before any match
@@ -37,6 +39,7 @@ export type NearbyPeer = {
   displayName: string; // real first name, shown up front to build trust
   photoUri?: string; // real photo if set; otherwise the emoji avatar shows
   verified: boolean; // shows a verified badge; a trust/anti-catfish signal
+  intents: IntentTag[]; // what they're open to — shown up front, filterable
   alias: string;
   avatar: AvatarSpec; // emoji avatar — the photo fallback
   bio: string; // short vibe — a signal to help you decide to say hi

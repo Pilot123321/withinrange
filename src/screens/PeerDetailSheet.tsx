@@ -7,6 +7,7 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { SafetyMenu } from '../components/SafetyMenu';
 import { Sheet } from '../components/Sheet';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import { INTENTS } from '../intents';
 import { colors, font, radius, space } from '../theme';
 import { closenessLabel, MatchReveal, NearbyPeer } from '../types';
 
@@ -48,6 +49,18 @@ export function PeerDetailSheet({
             <Text style={styles.closeness}>{closenessLabel[peer.closeness]}</Text>
           </View>
           {!!peer.bio && <Text style={styles.bio}>{peer.bio}</Text>}
+
+          {peer.intents.length > 0 && (
+            <View style={styles.intentRow}>
+              {peer.intents.map((tag) => (
+                <View key={tag} style={styles.intentChip}>
+                  <Text style={styles.intentText}>
+                    {INTENTS[tag].emoji} {INTENTS[tag].label}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           {matched ? (
             <>
@@ -100,6 +113,14 @@ const styles = StyleSheet.create({
   closenessRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   closeness: { fontSize: font.small, color: colors.textSoft },
   bio: { fontSize: font.body, color: colors.text, textAlign: 'center', lineHeight: 24, marginVertical: space.sm },
+  intentRow: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, justifyContent: 'center' },
+  intentChip: {
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.pill,
+    paddingVertical: space.xs,
+    paddingHorizontal: space.md,
+  },
+  intentText: { fontSize: font.small, fontWeight: '600', color: colors.text },
   matched: { fontSize: font.body, fontWeight: '600', color: colors.success, textAlign: 'center' },
   btn: { alignSelf: 'stretch' },
   sentPill: {

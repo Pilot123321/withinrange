@@ -1,3 +1,4 @@
+import { INTENT_ORDER, IntentTag } from '../intents';
 import { RangingEngine, RangingSample, RangingTech } from '../ranging';
 import { colors } from '../theme';
 import { MatchReveal, MyProfile, NearbyPeer, SocialHandle, SocialPlatform } from '../types';
@@ -87,6 +88,12 @@ function pick<T>(arr: T[]): T {
 
 // Give a demo person 2–3 socials. Values are obviously fake (".sim") and the
 // match is `demo`-flagged, so the UI never opens a real account.
+// Give a demo person 1–2 intents so the room is browsable/filterable.
+function makeIntents(): IntentTag[] {
+  const shuffled = [...INTENT_ORDER].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 1 + Math.floor(Math.random() * 2));
+}
+
 function makeHandles(name: string): SocialHandle[] {
   const lower = name.toLowerCase();
   const shuffled = [...PLATFORM_POOL].sort(() => Math.random() - 0.5);
@@ -125,6 +132,7 @@ function makeSimPeer(): SimPeer {
       avatar: { emoji: EMOJIS[i], color: pick(colors.avatarPalette) },
       bio: pick(BIOS),
       verified: Math.random() < 0.6, // ~60% of demo people are verified
+      intents: makeIntents(),
       bearing: Math.floor(Math.random() * 360),
       distanceM: trueDistanceM,
       closeness: closenessFor(trueDistanceM),

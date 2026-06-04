@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { NetworkGraph } from '../components/NetworkGraph';
 import { Photo } from '../components/Photo';
 import { VerifiedBadge } from '../components/VerifiedBadge';
+import { INTENT_ORDER, INTENTS, IntentTag } from '../intents';
 import { useStore } from '../store';
 import { colors, font, radius, space } from '../theme';
 import { NearbyPeer } from '../types';
@@ -17,6 +18,11 @@ export function NearbyScreen({ onSayHi }: { onSayHi: (peerId: string) => void })
   const [selected, setSelected] = useState<NearbyPeer | null>(null);
   const [finding, setFinding] = useState<NearbyPeer | null>(null);
   const [editing, setEditing] = useState(false);
+  const [filter, setFilter] = useState<IntentTag | null>(null);
+
+  // The differentiator: filter the room down to people open to a given intent
+  // (hiring, job-hunting, co-founders…) — something AirDrop/business cards can't do.
+  const visiblePeers = filter ? peers.filter((p) => p.intents.includes(filter)) : peers;
 
   if (!profile) return null;
   // Keep the open sheets in sync with live peer data (distance/bearing/sent).
@@ -68,6 +74,25 @@ export function NearbyScreen({ onSayHi }: { onSayHi: (peerId: string) => void })
         <Ionicons name="chevron-forward" size={18} color={colors.textSoft} />
       </Pressable>
 
+      {isOpen && peers.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterBar}
+          style={styles.filterBarWrap}
+        >
+          <FilterChip label="Everyone" active={filter === null} onPress={() => setFilter(null)} />
+          {INTENT_ORDER.map((tag) => (
+            <FilterChip
+              key={tag}
+              label={`${INTENTS[tag].emoji} ${INTENTS[tag].label}`}
+              active={filter === tag}
+              onPress={() => setFilter((f) => (f === tag ? null : tag))}
+            />
+          ))}
+        </ScrollView>
+      )}
+
       {!isOpen ? (
         <EmptyState title="You're hidden right now" body="No one nearby can see you. Flip “Open” on when you're ready." />
       ) : peers.length === 0 ? (
@@ -75,12 +100,19 @@ export function NearbyScreen({ onSayHi }: { onSayHi: (peerId: string) => void })
           title="Looking around…"
           body="When people who also use withinrange are near you, they'll appear on your map."
         />
+      ) : visiblePeers.length === 0 ? (
+        <EmptyState
+          title={`No one open to “${INTENTS[filter!].label}” right now`}
+          body="Try a different filter, or tap Everyone to see the whole room."
+        />
       ) : (
-        <NetworkGraph me={profile} peers={peers} sentHellos={sentHellos} onSelect={setSelected} />
+        <NetworkGraph me={profile} peers={visiblePeers} sentHellos={sentHellos} onSelect={setSelected} />
       )}
 
-      {isOpen && peers.length > 0 && (
-        <Text style={styles.footer}>Tap anyone to see their vibe. No one is ever told if you pass.</Text>
+      {isOpen && visiblePeers.length > 0 && (
+        <Text style={styles.footer}>
+          {filter ? `${visiblePeers.length} open to “${INTENTS[filter].label}” · ` : ''}Tap anyone to see their intent. No one is ever told if you pass.
+        </Text>
       )}
 
       <PeerDetailSheet
@@ -107,6 +139,19 @@ export function NearbyScreen({ onSayHi }: { onSayHi: (peerId: string) => void })
       />
       <ProfileEditor visible={editing} onClose={() => setEditing(false)} />
     </View>
+  );
+}
+
+function FilterChip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      style={[styles.filterChip, active && styles.filterChipOn]}
+    >
+      <Text style={[styles.filterChipText, active && styles.filterChipTextOn]}>{label}</Text>
+    </Pressable>
   );
 }
 
@@ -147,6 +192,19 @@ const styles = StyleSheet.create({
   meEdit: { fontSize: font.small, color: colors.textSoft },
   toggle: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
   toggleLabel: { fontSize: font.small, color: colors.textSoft, fontWeight: '600' },
+  filterBarWrap: { flexGrow: 0 },
+  filterBar: { paddingHorizontal: space.md, paddingVertical: space.sm, gap: space.sm },
+  filterChip: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.md,
+  },
+  filterChipOn: { backgroundColor: colors.text, borderColor: colors.text },
+  filterChipText: { fontSize: font.small, fontWeight: '600', color: colors.text },
+  filterChipTextOn: { color: colors.surface },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.sm },
   emptyTitle: { fontSize: font.title, fontWeight: '800', color: colors.text, textAlign: 'center' },
   emptyBody: { fontSize: font.body, color: colors.textSoft, textAlign: 'center', lineHeight: 24 },

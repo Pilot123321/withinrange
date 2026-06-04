@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { makeAlias } from '../alias';
+import { INTENT_ORDER, INTENTS, IntentTag } from '../intents';
 import { PLATFORM_ORDER, PLATFORMS } from '../platforms';
 import { AvatarPicker } from './AvatarPicker';
 import { PhotoPickerButton } from './PhotoPickerButton';
@@ -23,6 +24,10 @@ export function ProfileForm({
     const value = raw.replace(/^@+/, '');
     const others = draft.handles.filter((h) => h.platform !== platform);
     onChange({ handles: value.trim() ? [...others, { platform, value }] : others });
+  };
+  const toggleIntent = (tag: IntentTag) => {
+    const has = draft.intents.includes(tag);
+    onChange({ intents: has ? draft.intents.filter((t) => t !== tag) : [...draft.intents, tag] });
   };
 
   return (
@@ -66,6 +71,29 @@ export function ProfileForm({
         <Text style={styles.counter}>
           {draft.bio.length}/{BIO_MAX}
         </Text>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>What you're open to</Text>
+        <Text style={styles.hint}>Lets people nearby find you by what you're here for. Optional.</Text>
+        <View style={styles.chips}>
+          {INTENT_ORDER.map((tag) => {
+            const on = draft.intents.includes(tag);
+            return (
+              <Pressable
+                key={tag}
+                onPress={() => toggleIntent(tag)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                style={[styles.intentChip, on && styles.intentChipOn]}
+              >
+                <Text style={[styles.intentText, on && styles.intentTextOn]}>
+                  {INTENTS[tag].emoji} {INTENTS[tag].label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       <View style={styles.field}>
@@ -154,4 +182,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.md,
   },
   shuffleText: { fontSize: font.small, fontWeight: '700', color: colors.text },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.xs },
+  intentChip: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.pill,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.md,
+  },
+  intentChipOn: { backgroundColor: colors.primary, borderColor: colors.primary },
+  intentText: { fontSize: font.small, fontWeight: '600', color: colors.text },
+  intentTextOn: { color: colors.primaryText },
 });
+

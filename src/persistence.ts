@@ -30,9 +30,16 @@ function withHandles<T extends { handles?: unknown; instagram?: string }>(obj: T
 }
 
 function migrate(data: PersistedState): PersistedState {
+  const profile = data.profile
+    ? ((): PersistedState['profile'] => {
+        const p = withHandles(data.profile as never) as Record<string, unknown>;
+        if (!Array.isArray(p.intents)) p.intents = []; // added after handles
+        return p as never;
+      })()
+    : data.profile;
   return {
     ...data,
-    profile: data.profile ? (withHandles(data.profile as never) as PersistedState['profile']) : data.profile,
+    profile,
     matches: Array.isArray(data.matches) ? data.matches.map((m) => withHandles(m as never) as never) : data.matches,
   };
 }
