@@ -7,12 +7,21 @@ export type AvatarSpec = {
   color: string;
 };
 
+// withinrange is a neutral "swap your socials" tool — not a dating app. People
+// share whichever handles they like (Instagram, LinkedIn, Discord, …).
+export type SocialPlatform = 'instagram' | 'linkedin' | 'discord' | 'x' | 'snapchat';
+
+export type SocialHandle = {
+  platform: SocialPlatform;
+  value: string; // the handle/username, no leading "@"
+};
+
 // How I describe myself. Real identity (name + instagram) is private and is
 // ONLY ever shared with someone after a mutual "hi". Until then, others see
 // just my anonymous alias + avatar.
 export type MyProfile = {
   displayName: string;
-  instagram: string; // handle without the leading "@"
+  handles: SocialHandle[]; // the socials you offer to share
   alias: string; // friendly two-word alias others see, e.g. "Sky Otter"
   avatar: AvatarSpec;
   bio: string; // 2–3 lines, anonymous "vibe" shown before any match
@@ -49,10 +58,10 @@ export type MatchReveal = {
   alias: string;
   avatar: AvatarSpec;
   displayName: string;
-  instagram: string;
+  handles: SocialHandle[]; // the socials shared on a mutual connect
   bio: string;
   verified: boolean;
-  photoUri?: string; // real profile photo, revealed with the rest on a match
+  photoUri?: string; // real profile photo, revealed with the rest on a connect
   // True for simulated peers: handle is fake, so we MUST NOT deep-link to a
   // real instagram.com profile (it could belong to an uninvolved stranger).
   demo?: boolean;

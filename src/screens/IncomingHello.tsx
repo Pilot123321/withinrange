@@ -27,7 +27,7 @@ export function IncomingHello({
         </View>
         {!!peer?.bio && <Text style={styles.bio}>{peer.bio}</Text>}
         <Text style={styles.copy}>
-          If you're open to it, you'll both get each other's Instagram. If not, just tap “Not now” — they'll
+          If you're open to it, you'll both get each other's socials. If not, just tap “Not now” — they'll
           never know.
         </Text>
         <PrimaryButton label="I'm open 💫" onPress={onOpen} style={styles.btn} />

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { HandleList } from '../components/HandleList';
 import { Photo } from '../components/Photo';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SafetyMenu } from '../components/SafetyMenu';
@@ -50,7 +51,8 @@ export function PeerDetailSheet({
 
           {matched ? (
             <>
-              <Text style={styles.matched}>✅ You matched · @{matched.instagram}</Text>
+              <Text style={styles.matched}>✅ Connected</Text>
+              <HandleList handles={matched.handles} demo={matched.demo} />
               <PrimaryButton label="Find them 🧭" onPress={onFind} style={styles.btn} />
             </>
           ) : sent ? (

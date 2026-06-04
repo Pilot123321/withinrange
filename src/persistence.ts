@@ -14,10 +14,27 @@ export type PersistedState = Pick<
 export async function loadPersisted(): Promise<PersistedState | null> {
   try {
     const raw = await AsyncStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as PersistedState) : null;
+    if (!raw) return null;
+    return migrate(JSON.parse(raw) as PersistedState);
   } catch {
     return null; // corrupt/unavailable storage → start fresh
   }
+}
+
+// Forward-migrate older saves: the app used to store a single `instagram` string;
+// it now stores a `handles` array. Convert so old data doesn't crash the UI.
+function withHandles<T extends { handles?: unknown; instagram?: string }>(obj: T): T {
+  if (Array.isArray(obj.handles)) return obj;
+  const handles = obj.instagram ? [{ platform: 'instagram', value: obj.instagram }] : [];
+  return { ...obj, handles };
+}
+
+function migrate(data: PersistedState): PersistedState {
+  return {
+    ...data,
+    profile: data.profile ? (withHandles(data.profile as never) as PersistedState['profile']) : data.profile,
+    matches: Array.isArray(data.matches) ? data.matches.map((m) => withHandles(m as never) as never) : data.matches,
+  };
 }
 
 export async function savePersisted(data: PersistedState): Promise<void> {

@@ -1,8 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { makeAlias } from '../alias';
+import { PLATFORM_ORDER, PLATFORMS } from '../platforms';
 import { AvatarPicker } from './AvatarPicker';
 import { PhotoPickerButton } from './PhotoPickerButton';
-import { MyProfile } from '../types';
+import { MyProfile, SocialPlatform } from '../types';
 import { colors, font, radius, space } from '../theme';
 
 export const BIO_MAX = 140;
@@ -16,6 +18,13 @@ export function ProfileForm({
   draft: MyProfile;
   onChange: (patch: Partial<MyProfile>) => void;
 }) {
+  const getHandle = (platform: SocialPlatform) => draft.handles.find((h) => h.platform === platform)?.value ?? '';
+  const setHandle = (platform: SocialPlatform, raw: string) => {
+    const value = raw.replace(/^@+/, '');
+    const others = draft.handles.filter((h) => h.platform !== platform);
+    onChange({ handles: value.trim() ? [...others, { platform, value }] : others });
+  };
+
   return (
     <View style={{ gap: space.lg }}>
       <View style={{ gap: space.sm }}>
@@ -60,21 +69,29 @@ export function ProfileForm({
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Instagram</Text>
-        <View style={styles.inputRow}>
-          <Text style={styles.at}>@</Text>
-          <TextInput
-            style={[styles.input, styles.inputFlush]}
-            value={draft.instagram}
-            onChangeText={(t) => onChange({ instagram: t.replace(/^@+/, '') })}
-            placeholder="yourhandle"
-            placeholderTextColor={colors.textSoft}
-            autoCapitalize="none"
-            autoCorrect={false}
-            accessibilityLabel="Your Instagram handle"
-          />
+        <Text style={styles.label}>Your socials</Text>
+        <Text style={styles.hint}>Add any you like — shared only when you both connect. At least one.</Text>
+        <View style={{ gap: space.sm, marginTop: space.xs }}>
+        {PLATFORM_ORDER.map((platform) => {
+          const p = PLATFORMS[platform];
+          return (
+            <View key={platform} style={styles.inputRow}>
+              <Ionicons name={p.icon} size={20} color={p.color} />
+              {!!p.prefix && <Text style={styles.at}>{p.prefix}</Text>}
+              <TextInput
+                style={[styles.input, styles.inputFlush]}
+                value={getHandle(platform)}
+                onChangeText={(t) => setHandle(platform, t)}
+                placeholder={`${p.label}${platform === 'linkedin' ? ' (profile id)' : ''}`}
+                placeholderTextColor={colors.textSoft}
+                autoCapitalize="none"
+                autoCorrect={false}
+                accessibilityLabel={`Your ${p.label}`}
+              />
+            </View>
+          );
+        })}
         </View>
-        <Text style={styles.hint}>Shared only when you both say hi.</Text>
       </View>
 
       <View style={styles.field}>
@@ -117,6 +134,7 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: space.sm,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,

@@ -99,8 +99,7 @@ export function NearbyScreen({ onSayHi }: { onSayHi: (peerId: string) => void })
       <DirectionFinder
         peer={findingLive}
         sent={!!findingLive && sentHellos.includes(findingLive.id)}
-        matchedHandle={findingLive ? matchedFor(findingLive.id)?.instagram : undefined}
-        demo={findingLive ? matchedFor(findingLive.id)?.demo : undefined}
+        connected={!!findingLive && !!matchedFor(findingLive.id)}
         onSayHi={() => findingLive && onSayHi(findingLive.id)}
         onReport={(reason) => findingLive && reportPeer(findingLive.id, reason)}
         onBlock={() => findingLive && blockPeer(findingLive.id)}

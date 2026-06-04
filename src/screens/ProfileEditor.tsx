@@ -29,7 +29,7 @@ export function ProfileEditor({ visible, onClose }: { visible: boolean; onClose:
   }, [visible, state.profile]);
 
   if (!draft) return null;
-  const canSave = draft.displayName.trim().length > 0 && draft.instagram.trim().length > 0;
+  const canSave = draft.displayName.trim().length > 0 && draft.handles.some((h) => h.value.trim().length > 0);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
@@ -53,8 +53,8 @@ export function ProfileEditor({ visible, onClose }: { visible: boolean; onClose:
                 profile: {
                   ...draft,
                   displayName: draft.displayName.trim(),
-                  instagram: draft.instagram.trim(),
                   bio: draft.bio.trim(),
+                  handles: draft.handles.filter((h) => h.value.trim()).map((h) => ({ ...h, value: h.value.trim() })),
                 },
               });
               onClose();

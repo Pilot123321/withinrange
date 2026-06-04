@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { HandleList } from '../components/HandleList';
 import { Photo } from '../components/Photo';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SafetyMenu } from '../components/SafetyMenu';
@@ -8,8 +9,8 @@ import { useStore } from '../store';
 import { colors, font, radius, space } from '../theme';
 import { MatchReveal } from '../types';
 
-// The payoff: both said hi, so now the Instagram handle is shared between the
-// two of you. Celebratory and mutual — never one-sided.
+// The payoff: both said hi, so now their socials are shared between the two of
+// you. Celebratory and mutual — never one-sided.
 export function MatchOverlay({
   match,
   onDone,
@@ -29,7 +30,7 @@ export function MatchOverlay({
     <Modal visible={!!match} transparent animationType="fade" onRequestClose={onDone}>
       <View style={styles.backdrop}>
         <View style={styles.card}>
-          <Text style={styles.kicker}>It's mutual 🎉</Text>
+          <Text style={styles.kicker}>You connected 🎉</Text>
 
           <View style={styles.avatars}>
             {me && <Photo photoUri={me.photoUri} avatar={me.avatar} size={64} />}
@@ -44,24 +45,8 @@ export function MatchOverlay({
                 <VerifiedBadge verified={match.verified} size={20} />
               </View>
               {!!match.bio && <Text style={styles.bio}>{match.bio}</Text>}
-
-              {match.demo ? (
-                // Simulated peer — the handle is fake, so we never open a real
-                // instagram.com URL that could belong to an uninvolved stranger.
-                <View style={styles.handlePill}>
-                  <Text style={styles.handle}>@{match.instagram}</Text>
-                  <Text style={styles.demoNote}>simulated — not a real account</Text>
-                </View>
-              ) : (
-                <Pressable
-                  onPress={() => Linking.openURL(`https://instagram.com/${match.instagram}`)}
-                  accessibilityRole="link"
-                  accessibilityLabel={`Open Instagram profile @${match.instagram}`}
-                  style={styles.handlePill}
-                >
-                  <Text style={styles.handle}>@{match.instagram}</Text>
-                </Pressable>
-              )}
+              <HandleList handles={match.handles} demo={match.demo} />
+              {match.demo && <Text style={styles.demoNote}>simulated — not real accounts</Text>}
             </>
           )}
 

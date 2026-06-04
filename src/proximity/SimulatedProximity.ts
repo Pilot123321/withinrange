@@ -1,6 +1,6 @@
 import { RangingEngine, RangingSample, RangingTech } from '../ranging';
 import { colors } from '../theme';
-import { MatchReveal, MyProfile, NearbyPeer } from '../types';
+import { MatchReveal, MyProfile, NearbyPeer, SocialHandle, SocialPlatform } from '../types';
 import { ProximityHandlers, ProximityProvider } from './ProximityProvider';
 
 // A fake "room" of people so the whole social flow can be felt on ONE device,
@@ -15,9 +15,9 @@ import { ProximityHandlers, ProximityProvider } from './ProximityProvider';
 
 type SimPeer = {
   peer: NearbyPeer;
-  // Hidden real identity — revealed ONLY on a mutual match, never before.
+  // Hidden real identity — revealed ONLY on a mutual connect, never before.
   realName: string;
-  instagram: string;
+  handles: SocialHandle[];
   likesMe: boolean;
   // Hidden ground-truth distance + which radios this pretend phone supports.
   trueDistanceM: number;
@@ -68,17 +68,33 @@ const ANIMALS = ['Otter', 'Sparrow', 'Fox', 'Koala', 'Heron', 'Lynx', 'Finch', '
 const EMOJIS = ['🦦', '🐦', '🦊', '🐨', '🪶', '🐱', '🐧', '🐼', '🦉', '🦭'];
 const NAMES = ['Alex', 'Sam', 'Jordan', 'Riley', 'Casey', 'Taylor', 'Jamie', 'Morgan', 'Devon', 'Quinn'];
 
+// Neutral, networking-friendly vibes — withinrange is for swapping socials, not
+// dating, so the copy stays away from romance.
 const BIOS = [
-  'here with friends, terrible at chess\nlooking for someone to split fries with',
-  'design student, runs on oat lattes\nask me about my film camera',
-  'new in town, into live music\nwould love a concert buddy',
-  'gym → ramen → repeat\nbig on dogs, bad at texting back',
-  'reading in the corner, say hi\ninto indie playlists and rainy days',
-  'just here for the playlist tonight\nlet’s talk about anything but work',
+  'cs major, building a side project\nhappy to talk shop',
+  'here for the talks — say hi\ninto climbing and indie games',
+  'product designer, coffee enthusiast\nshow me what you’re working on',
+  'startup founder, always down to network\nask me anything',
+  'new in town, looking for collaborators\nmusic + film nerd',
+  'just here for the snacks 😄\nlet’s connect on LinkedIn',
 ];
+
+const PLATFORM_POOL: SocialPlatform[] = ['instagram', 'linkedin', 'x', 'discord', 'snapchat'];
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// Give a demo person 2–3 socials. Values are obviously fake (".sim") and the
+// match is `demo`-flagged, so the UI never opens a real account.
+function makeHandles(name: string): SocialHandle[] {
+  const lower = name.toLowerCase();
+  const shuffled = [...PLATFORM_POOL].sort(() => Math.random() - 0.5);
+  const count = 2 + Math.floor(Math.random() * 2);
+  return shuffled.slice(0, count).map((platform) => ({
+    platform,
+    value: platform === 'discord' ? `${lower}.sim#${1000 + Math.floor(Math.random() * 9000)}` : `${lower}.sim`,
+  }));
 }
 
 // Discovery range: people farther than this are out of range and not shown.
@@ -115,9 +131,9 @@ function makeSimPeer(): SimPeer {
       via: caps,
     },
     realName: name,
-    // Obviously-fake handle. The `demo` flag on a match stops the UI from ever
-    // opening instagram.com with it, so we can't send users to a real stranger.
-    instagram: `${name.toLowerCase()}.simulated`,
+    // Obviously-fake handles. The `demo` flag on a connect stops the UI from
+    // ever opening a real profile, so we can't send users to a real stranger.
+    handles: makeHandles(name),
     likesMe: Math.random() < 0.5,
     trueDistanceM,
     caps,
@@ -212,10 +228,10 @@ export class SimulatedProximity implements ProximityProvider {
       alias: sp.peer.alias,
       avatar: sp.peer.avatar,
       displayName: sp.realName,
-      instagram: sp.instagram,
+      handles: sp.handles,
       bio: sp.peer.bio,
       verified: sp.peer.verified,
-      demo: true, // simulated handle — UI must not open instagram.com with it
+      demo: true, // simulated handles — UI must not open a real profile with them
     };
     this.handlers.onMatch(reveal);
   }

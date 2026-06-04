@@ -1,11 +1,14 @@
 # withinrange
 
-Meet the people physically around you — **only if you both want to.**
+Swap socials with the people physically around you — **only if you both want to.**
 
-withinrange solves a specific, common discomfort: you'd like to ask someone
-nearby for their Instagram, but asking out loud risks public rejection. So
+withinrange is **not a dating app** — it's a neutral way to exchange contacts
+(Instagram, LinkedIn, Discord, X, Snapchat) with people nearby at meetups,
+conferences, classes, and events. It solves a common discomfort: you'd like to
+swap handles with someone nearby, but asking out loud risks public rejection, so
 nobody asks. withinrange lets two people who are near each other connect
-**anonymously and symmetrically**, so the awkward part never happens.
+**symmetrically**, so the awkward part never happens — and you only ever share
+the socials *you* choose.
 
 ## The design thesis: nobody should ever feel uncomfortable
 

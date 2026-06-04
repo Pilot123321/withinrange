@@ -9,7 +9,7 @@ type TabDef = { key: TabKey; label: string; icon: keyof typeof Ionicons.glyphMap
 
 const TABS: TabDef[] = [
   { key: 'nearby', label: 'Nearby', icon: 'compass-outline', activeIcon: 'compass' },
-  { key: 'matches', label: 'Matches', icon: 'heart-outline', activeIcon: 'heart' },
+  { key: 'matches', label: 'Connections', icon: 'people-outline', activeIcon: 'people' },
 ];
 
 // iOS-style bottom tab bar: hairline top separator, icon + caption, tinted when

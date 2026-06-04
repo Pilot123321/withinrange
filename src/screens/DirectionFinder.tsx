@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Polygon } from 'react-native-svg';
 import { Photo } from '../components/Photo';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -23,8 +23,7 @@ export function DirectionFinder({
   onReport,
   onBlock,
   onClose,
-  matchedHandle,
-  demo,
+  connected,
 }: {
   peer: NearbyPeer | null;
   sent: boolean;
@@ -32,11 +31,9 @@ export function DirectionFinder({
   onReport: (reason: string) => void;
   onBlock: () => void;
   onClose: () => void;
-  // When finding someone you've already matched, show their handle instead of
-  // the "say hi" affordance. `demo` keeps simulated handles from opening a real
-  // instagram.com profile.
-  matchedHandle?: string;
-  demo?: boolean;
+  // True when you've already connected — show a "connected" note instead of the
+  // "say hi" affordance (their socials live in the Connections tab).
+  connected?: boolean;
 }) {
   const heading = useHeading(!!peer);
   const [safety, setSafety] = useState(false);
@@ -91,17 +88,11 @@ export function DirectionFinder({
             )}
 
             <View style={styles.actions}>
-              {matchedHandle ? (
-                <Pressable
-                  style={styles.handlePill}
-                  disabled={demo}
-                  onPress={() => Linking.openURL(`https://instagram.com/${matchedHandle}`)}
-                  accessibilityRole="link"
-                  accessibilityLabel={`Open Instagram @${matchedHandle}`}
-                >
-                  <Text style={styles.handleText}>✅ @{matchedHandle}</Text>
-                  {demo && <Text style={styles.demoNote}>simulated — not a real account</Text>}
-                </Pressable>
+              {connected ? (
+                <View style={styles.handlePill}>
+                  <Text style={styles.handleText}>✅ Connected</Text>
+                  <Text style={styles.demoNote}>their socials are in your Connections tab</Text>
+                </View>
               ) : sent ? (
                 <View style={styles.sentPill}>
                   <Text style={styles.sentText}>👋 hi sent — you'll connect if they're open too</Text>

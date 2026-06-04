@@ -4,9 +4,10 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { useStore } from '../store';
 import { colors, font, radius, space } from '../theme';
 
-// Hard 18+ gate. A dating app handling minors is a legal and moral non-starter,
-// so this is the very first screen. (A production app would verify age more
-// robustly — ID/credit-card/third-party — this is the honest minimum.)
+// Age gate (currently 18+). withinrange isn't a dating app, so you may want to
+// lower or remove this threshold for your market — it's a single check here.
+// A production app would verify age more robustly (third-party age assurance);
+// this self-declared gate is just the honest minimum.
 function ageFrom(y: number, m: number, d: number): number | null {
   const dob = new Date(y, m - 1, d);
   if (dob.getFullYear() !== y || dob.getMonth() !== m - 1 || dob.getDate() !== d) return null; // invalid date

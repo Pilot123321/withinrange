@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { FlatList, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { HandleList } from '../components/HandleList';
 import { Photo } from '../components/Photo';
 import { SafetyMenu } from '../components/SafetyMenu';
 import { VerifiedBadge } from '../components/VerifiedBadge';
@@ -9,9 +10,9 @@ import { colors, font, radius, space } from '../theme';
 import { MatchReveal, NearbyPeer } from '../types';
 import { DirectionFinder } from './DirectionFinder';
 
-// The "Matches" tab: everyone you've mutually said hi to and swapped Instagram
-// with. Tap a handle to open Instagram (never for simulated demo matches), and
-// re-open the finder for anyone who's still in range.
+// The "Connections" tab: everyone you've mutually connected with and swapped
+// socials with. Tap a handle to open it, and re-open the finder for anyone
+// who's still in range.
 export function MatchesScreen() {
   const { state, dispatch } = useStore();
   const { matches, peers } = state;
@@ -20,12 +21,7 @@ export function MatchesScreen() {
 
   const nearbyById = new Map(peers.map((p) => [p.id, p]));
   const findingLive = finding ? peers.find((p) => p.id === finding.id) ?? null : null;
-  const matchedHandleFor = (id: string) => matches.find((m) => m.peerId === id);
-
-  function openInstagram(m: MatchReveal) {
-    if (m.demo) return; // simulated handle — never open a real profile
-    Linking.openURL(`https://instagram.com/${m.instagram}`);
-  }
+  const isConnected = (id: string) => matches.some((m) => m.peerId === id);
 
   function clearAfterSafety() {
     setSafetyFor(null);
@@ -35,15 +31,15 @@ export function MatchesScreen() {
   return (
     <View style={styles.flex}>
       <View style={styles.nav}>
-        <Text style={styles.largeTitle}>Matches</Text>
+        <Text style={styles.largeTitle}>Connections</Text>
       </View>
 
       {matches.length === 0 ? (
         <View style={styles.empty}>
-          <Ionicons name="heart-outline" size={44} color={colors.textSoft} />
+          <Ionicons name="people-outline" size={44} color={colors.textSoft} />
           <Text style={styles.emptyTitle}>No connections yet</Text>
           <Text style={styles.emptyBody}>
-            When you and someone nearby both say hi, you'll swap Instagram — and they'll show up here.
+            When you and someone nearby both say hi, you'll swap socials — and they'll show up here.
           </Text>
         </View>
       ) : (
@@ -61,17 +57,7 @@ export function MatchesScreen() {
                     <Text style={styles.name}>{item.displayName}</Text>
                     <VerifiedBadge verified={item.verified} size={15} />
                   </View>
-                  <Pressable
-                    onPress={() => openInstagram(item)}
-                    disabled={item.demo}
-                    accessibilityRole="link"
-                    accessibilityLabel={`Open Instagram @${item.instagram}`}
-                  >
-                    <Text style={styles.handle}>
-                      @{item.instagram}
-                      {item.demo ? ' · simulated' : ''}
-                    </Text>
-                  </Pressable>
+                  <HandleList handles={item.handles} demo={item.demo} compact />
                   {nearby && <Text style={styles.nearbyNote}>● nearby now</Text>}
                 </View>
                 {nearby && (
@@ -101,8 +87,7 @@ export function MatchesScreen() {
       <DirectionFinder
         peer={findingLive}
         sent={false}
-        matchedHandle={findingLive ? matchedHandleFor(findingLive.id)?.instagram : undefined}
-        demo={findingLive ? matchedHandleFor(findingLive.id)?.demo : undefined}
+        connected={findingLive ? isConnected(findingLive.id) : false}
         onSayHi={() => {}}
         onReport={(reason) => {
           if (findingLive) dispatch({ type: 'REPORT', peerId: findingLive.id, reason });

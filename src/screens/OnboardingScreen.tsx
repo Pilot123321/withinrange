@@ -9,20 +9,20 @@ import { colors, font, space } from '../theme';
 
 function emptyProfile(): MyProfile {
   const { alias, avatar } = makeAlias();
-  return { displayName: '', instagram: '', bio: '', alias, avatar, photoUri: undefined, verified: false };
+  return { displayName: '', handles: [], bio: '', alias, avatar, photoUri: undefined, verified: false };
 }
 
 export function OnboardingScreen() {
   const { dispatch } = useStore();
   const [draft, setDraft] = useState<MyProfile>(emptyProfile);
 
-  const canStart = draft.displayName.trim().length > 0 && draft.instagram.trim().length > 0;
+  const canStart = draft.displayName.trim().length > 0 && draft.handles.some((h) => h.value.trim().length > 0);
 
   return (
     <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
         <Text style={styles.brand}>withinrange</Text>
-        <Text style={styles.tagline}>Meet the people around you — only if you both want to.</Text>
+        <Text style={styles.tagline}>Swap socials with people around you — only if you both want to.</Text>
 
         <ProfileForm draft={draft} onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))} />
 
@@ -34,8 +34,8 @@ export function OnboardingScreen() {
               profile: {
                 ...draft,
                 displayName: draft.displayName.trim(),
-                instagram: draft.instagram.trim(),
                 bio: draft.bio.trim(),
+                handles: draft.handles.filter((h) => h.value.trim()).map((h) => ({ ...h, value: h.value.trim() })),
               },
             })
           }
