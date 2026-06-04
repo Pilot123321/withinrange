@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { TabBar, TabKey } from './src/components/TabBar';
+import { loadPersisted, savePersisted } from './src/persistence';
 import { ProximityProvider } from './src/proximity/ProximityProvider';
 import { SimulatedProximity } from './src/proximity/SimulatedProximity';
 import { AgeGateScreen } from './src/screens/AgeGateScreen';
@@ -23,6 +24,28 @@ export default function App() {
   // The proximity engine. Swap `SimulatedProximity` for a Bluetooth-backed
   // provider later and nothing below has to change.
   const provider = useRef<ProximityProvider>(new SimulatedProximity());
+
+  // Load saved data once on launch, then persist the durable slice whenever it
+  // changes. The `hydrated` guard stops us overwriting storage with the empty
+  // initial state before the load finishes.
+  const hydrated = useRef(false);
+  useEffect(() => {
+    loadPersisted().then((data) => {
+      hydrated.current = true;
+      dispatch({ type: 'HYDRATE', data });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    savePersisted({
+      profile: state.profile,
+      matches: state.matches,
+      blocked: state.blocked,
+      reports: state.reports,
+      verifiedOnly: state.verifiedOnly,
+    });
+  }, [state.profile, state.matches, state.blocked, state.reports, state.verifiedOnly]);
 
   // Start advertising/scanning only while I'm in the app AND open to connect.
   useEffect(() => {
@@ -49,7 +72,11 @@ export default function App() {
       <StoreContext.Provider value={store}>
         <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
           <StatusBar style="dark" />
-        {state.phase === 'agegate' ? (
+        {state.phase === 'loading' ? (
+          <View style={styles.splash}>
+            <ActivityIndicator color={colors.primary} />
+          </View>
+        ) : state.phase === 'agegate' ? (
           <AgeGateScreen />
         ) : state.phase === 'onboarding' ? (
           <OnboardingScreen />
@@ -103,4 +130,5 @@ export default function App() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   flex: { flex: 1 },
+  splash: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

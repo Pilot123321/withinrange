@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+import type { PersistedState } from './persistence';
 import { MatchReveal, MyProfile, NearbyPeer } from './types';
 
 export type Report = { peerId: string; reason: string; at: number };
@@ -8,7 +9,7 @@ export const HELLO_LIMIT = 8;
 export const HELLO_WINDOW_MS = 5 * 60 * 1000;
 
 export type AppState = {
-  phase: 'agegate' | 'onboarding' | 'main';
+  phase: 'loading' | 'agegate' | 'onboarding' | 'main';
   profile: MyProfile | null;
   isOpen: boolean; // am I discoverable right now?
   verifiedOnly: boolean; // only let verified people say hi to me
@@ -23,7 +24,7 @@ export type AppState = {
 };
 
 export const initialState: AppState = {
-  phase: 'agegate', // 18+ gate comes first
+  phase: 'loading', // wait for persisted state to hydrate before routing
   profile: null,
   isOpen: true,
   verifiedOnly: false,
@@ -43,6 +44,7 @@ export function recentHelloCount(times: number[], now = Date.now()): number {
 }
 
 export type Action =
+  | { type: 'HYDRATE'; data: PersistedState | null }
   | { type: 'COMPLETE_AGEGATE' }
   | { type: 'COMPLETE_ONBOARDING'; profile: MyProfile }
   | { type: 'UPDATE_PROFILE'; profile: MyProfile }
@@ -60,6 +62,24 @@ export type Action =
 
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
+    case 'HYDRATE': {
+      // Restore saved data on launch. If we already have a profile, skip the
+      // age gate + onboarding straight to the main app.
+      const d = action.data;
+      if (d?.profile) {
+        return {
+          ...state,
+          profile: d.profile,
+          matches: d.matches ?? [],
+          blocked: d.blocked ?? [],
+          reports: d.reports ?? [],
+          verifiedOnly: d.verifiedOnly ?? false,
+          phase: 'main',
+        };
+      }
+      return { ...state, phase: 'agegate' };
+    }
+
     case 'COMPLETE_AGEGATE':
       return { ...state, phase: 'onboarding' };
 
