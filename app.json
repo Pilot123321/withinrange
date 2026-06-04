@@ -10,7 +10,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.withinrange.app",
       "entitlements": {
-        "com.apple.security.application-groups": ["group.com.withinrange.app"]
+        "com.apple.security.application-groups": [
+          "group.com.withinrange.app"
+        ]
       }
     },
     "android": {
@@ -26,7 +28,15 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "@bacons/apple-targets"
+      "@bacons/apple-targets",
+      [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": true,
+          "modes": ["central", "peripheral"],
+          "bluetoothAlwaysPermission": "withinrange uses Bluetooth to discover people open to connect right around you."
+        }
+      ]
     ]
   }
 }

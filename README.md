@@ -145,8 +145,12 @@ anomaly detection (mass-hellos, rapid re-registration, report clusters).
 - [x] Safety v1: report/block everywhere + mutual invisibility
 - [x] Safety v2 (client): 18+ age gate, verification badges + verified-only,
       hello rate-limiting
-- [ ] `BleProximity` real Bluetooth provider (local-first / offline-capable)
-- [ ] Consent-handshake backend + push notifications
+- [~] `BleProximity` — real BLE **scan + ranging** (react-native-ble-plx) wired
+      to the `RangingEngine` via a platform-split factory (web/Expo Go stay on the
+      simulator). Identity + the hi/connect handshake still need a backend, and it
+      needs a **dev build + 2 phones** to validate. See `src/proximity/BleProximity.ts`.
+- [ ] Consent-handshake backend + push notifications (resolves ephemeral id →
+      profile; brokers hi/match — the part BLE can't carry in ~31 advert bytes)
 - [ ] Safety v2 (server): real selfie verification, device attestation,
       anomaly detection (needs a backend / native dev build)
 

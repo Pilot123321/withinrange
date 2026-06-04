@@ -4,8 +4,8 @@ import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { TabBar, TabKey } from './src/components/TabBar';
 import { loadPersisted, savePersisted } from './src/persistence';
+import { createProvider } from './src/proximity/createProvider';
 import { ProximityProvider } from './src/proximity/ProximityProvider';
-import { SimulatedProximity } from './src/proximity/SimulatedProximity';
 import { AgeGateScreen } from './src/screens/AgeGateScreen';
 import { IncomingHello } from './src/screens/IncomingHello';
 import { MatchesScreen } from './src/screens/MatchesScreen';
@@ -23,7 +23,8 @@ export default function App() {
 
   // The proximity engine. Swap `SimulatedProximity` for a Bluetooth-backed
   // provider later and nothing below has to change.
-  const provider = useRef<ProximityProvider>(new SimulatedProximity());
+  // Simulator on web/Expo Go; real BLE on a native dev build that has it.
+  const provider = useRef<ProximityProvider>(createProvider());
 
   // Load saved data once on launch, then persist the durable slice whenever it
   // changes. The `hydrated` guard stops us overwriting storage with the empty
