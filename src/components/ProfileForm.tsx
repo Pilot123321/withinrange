@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { makeAlias } from '../alias';
 import { INTENT_ORDER, INTENTS, IntentTag } from '../intents';
-import { HOBBIES, MBTI_TYPES } from '../personal';
+import { MBTI_TYPES } from '../personal';
 import { PLATFORM_ORDER, PLATFORMS } from '../platforms';
 import { AvatarPicker } from './AvatarPicker';
 import { PhotoPickerButton } from './PhotoPickerButton';
@@ -30,10 +31,15 @@ export function ProfileForm({
     const has = draft.intents.includes(tag);
     onChange({ intents: has ? draft.intents.filter((t) => t !== tag) : [...draft.intents, tag] });
   };
-  const toggleHobby = (h: string) => {
-    const has = draft.hobbies.includes(h);
-    onChange({ hobbies: has ? draft.hobbies.filter((x) => x !== h) : [...draft.hobbies, h] });
+  const [hobbyDraft, setHobbyDraft] = useState('');
+  const addHobby = () => {
+    const h = hobbyDraft.trim();
+    setHobbyDraft('');
+    if (!h || draft.hobbies.length >= 10) return;
+    if (draft.hobbies.some((x) => x.toLowerCase() === h.toLowerCase())) return; // no dupes
+    onChange({ hobbies: [...draft.hobbies, h] });
   };
+  const removeHobby = (h: string) => onChange({ hobbies: draft.hobbies.filter((x) => x !== h) });
 
   return (
     <View style={{ gap: space.lg }}>
@@ -103,23 +109,45 @@ export function ProfileForm({
 
       <View style={styles.field}>
         <Text style={styles.label}>Hobbies</Text>
-        <Text style={styles.hint}>Optional. Helps people find common ground.</Text>
-        <View style={styles.chips}>
-          {HOBBIES.map((h) => {
-            const on = draft.hobbies.includes(h);
-            return (
+        <Text style={styles.hint}>Type a hobby and add it. Helps people find common ground. Optional.</Text>
+        <View style={styles.inputRow}>
+          <TextInput
+            style={[styles.input, styles.inputFlush]}
+            value={hobbyDraft}
+            onChangeText={setHobbyDraft}
+            onSubmitEditing={addHobby}
+            placeholder="e.g. rock climbing"
+            placeholderTextColor={colors.textSoft}
+            returnKeyType="done"
+            maxLength={24}
+            blurOnSubmit={false}
+            accessibilityLabel="Add a hobby"
+          />
+          <Pressable
+            onPress={addHobby}
+            accessibilityRole="button"
+            accessibilityLabel="Add hobby"
+            style={styles.addBtn}
+            disabled={!hobbyDraft.trim()}
+          >
+            <Ionicons name="add" size={24} color={hobbyDraft.trim() ? colors.primary : colors.textSoft} />
+          </Pressable>
+        </View>
+        {draft.hobbies.length > 0 && (
+          <View style={styles.chips}>
+            {draft.hobbies.map((h) => (
               <Pressable
                 key={h}
-                onPress={() => toggleHobby(h)}
+                onPress={() => removeHobby(h)}
                 accessibilityRole="button"
-                accessibilityState={{ selected: on }}
-                style={[styles.intentChip, on && styles.intentChipOn]}
+                accessibilityLabel={`Remove ${h}`}
+                style={[styles.intentChip, styles.intentChipOn]}
               >
-                <Text style={[styles.intentText, on && styles.intentTextOn]}>{h}</Text>
+                <Text style={[styles.intentText, styles.intentTextOn]}>{h}  ✕</Text>
               </Pressable>
-            );
-          })}
-        </View>
+            ))}
+          </View>
+        )}
       </View>
 
       <View style={styles.field}>
@@ -229,6 +257,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.md,
   },
   shuffleText: { fontSize: font.small, fontWeight: '700', color: colors.text },
+  addBtn: { paddingHorizontal: space.md, alignItems: 'center', justifyContent: 'center' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, marginTop: space.xs },
   intentChip: {
     backgroundColor: colors.surface,
