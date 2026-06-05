@@ -28,6 +28,12 @@ export function ProfileEditor({ visible, onClose }: { visible: boolean; onClose:
     if (visible) setDraft(state.profile);
   }, [visible, state.profile]);
 
+  // While the editor is open, hold incoming invitations / match pop-ups so they
+  // don't interrupt you mid-edit — they reappear once you close it.
+  useEffect(() => {
+    dispatch({ type: 'SET_EDITING', value: visible });
+  }, [visible, dispatch]);
+
   if (!draft) return null;
   const canSave = draft.displayName.trim().length > 0 && draft.handles.some((h) => h.value.trim().length > 0);
 

@@ -108,7 +108,7 @@ export default function App() {
         )}
 
         <IncomingHello
-          peer={state.incoming}
+          peer={state.editing ? null : state.incoming}
           onOpen={() => state.incoming && provider.current.respondToHello(state.incoming.id, true)}
           onDismiss={() => {
             if (state.incoming) provider.current.respondToHello(state.incoming.id, false);
@@ -117,7 +117,7 @@ export default function App() {
         />
 
         <MatchOverlay
-          match={state.match}
+          match={state.editing ? null : state.match}
           onDone={() => dispatch({ type: 'CLEAR_MATCH' })}
           onReport={(peerId, reason) => dispatch({ type: 'REPORT', peerId, reason })}
           onBlock={(peerId) => dispatch({ type: 'BLOCK', peerId })}

@@ -12,6 +12,7 @@ export type AppState = {
   phase: 'loading' | 'agegate' | 'onboarding' | 'main';
   profile: MyProfile | null;
   isOpen: boolean; // am I discoverable right now?
+  editing: boolean; // profile editor open → hold pop-ups (do-not-disturb)
   verifiedOnly: boolean; // only let verified people say hi to me
   peers: NearbyPeer[];
   sentHellos: string[]; // peerIds I've said hi to (waiting, never "rejected")
@@ -27,6 +28,7 @@ export const initialState: AppState = {
   phase: 'loading', // wait for persisted state to hydrate before routing
   profile: null,
   isOpen: true,
+  editing: false,
   verifiedOnly: false,
   peers: [],
   sentHellos: [],
@@ -49,6 +51,7 @@ export type Action =
   | { type: 'COMPLETE_ONBOARDING'; profile: MyProfile }
   | { type: 'UPDATE_PROFILE'; profile: MyProfile }
   | { type: 'VERIFY_ME' }
+  | { type: 'SET_EDITING'; value: boolean }
   | { type: 'SET_VERIFIED_ONLY'; value: boolean }
   | { type: 'SET_OPEN'; value: boolean }
   | { type: 'PEERS_CHANGED'; peers: NearbyPeer[] }
@@ -91,6 +94,9 @@ export function reducer(state: AppState, action: Action): AppState {
 
     case 'VERIFY_ME':
       return state.profile ? { ...state, profile: { ...state.profile, verified: true } } : state;
+
+    case 'SET_EDITING':
+      return { ...state, editing: action.value };
 
     case 'SET_VERIFIED_ONLY':
       return { ...state, verifiedOnly: action.value };
