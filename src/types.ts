@@ -24,6 +24,8 @@ export type MyProfile = {
   displayName: string;
   handles: SocialHandle[]; // the socials you offer to share
   intents: IntentTag[]; // what you're open to — browsable/filterable by others
+  hobbies: string[]; // consented personal context, shown to people nearby
+  mbti?: string; // optional MBTI type (e.g. "ENFP")
   alias: string; // friendly two-word alias others see, e.g. "Sky Otter"
   avatar: AvatarSpec;
   bio: string; // 2–3 lines, anonymous "vibe" shown before any match
@@ -40,6 +42,8 @@ export type NearbyPeer = {
   photoUri?: string; // real photo if set; otherwise the emoji avatar shows
   verified: boolean; // shows a verified badge; a trust/anti-catfish signal
   intents: IntentTag[]; // what they're open to — shown up front, filterable
+  hobbies: string[]; // consented personal context, shown up front
+  mbti?: string; // optional MBTI type
   alias: string;
   avatar: AvatarSpec; // emoji avatar — the photo fallback
   bio: string; // short vibe — a signal to help you decide to say hi

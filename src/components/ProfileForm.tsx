@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { makeAlias } from '../alias';
 import { INTENT_ORDER, INTENTS, IntentTag } from '../intents';
+import { HOBBIES, MBTI_TYPES } from '../personal';
 import { PLATFORM_ORDER, PLATFORMS } from '../platforms';
 import { AvatarPicker } from './AvatarPicker';
 import { PhotoPickerButton } from './PhotoPickerButton';
@@ -28,6 +29,10 @@ export function ProfileForm({
   const toggleIntent = (tag: IntentTag) => {
     const has = draft.intents.includes(tag);
     onChange({ intents: has ? draft.intents.filter((t) => t !== tag) : [...draft.intents, tag] });
+  };
+  const toggleHobby = (h: string) => {
+    const has = draft.hobbies.includes(h);
+    onChange({ hobbies: has ? draft.hobbies.filter((x) => x !== h) : [...draft.hobbies, h] });
   };
 
   return (
@@ -90,6 +95,48 @@ export function ProfileForm({
                 <Text style={[styles.intentText, on && styles.intentTextOn]}>
                   {INTENTS[tag].emoji} {INTENTS[tag].label}
                 </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>Hobbies</Text>
+        <Text style={styles.hint}>Optional. Helps people find common ground.</Text>
+        <View style={styles.chips}>
+          {HOBBIES.map((h) => {
+            const on = draft.hobbies.includes(h);
+            return (
+              <Pressable
+                key={h}
+                onPress={() => toggleHobby(h)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                style={[styles.intentChip, on && styles.intentChipOn]}
+              >
+                <Text style={[styles.intentText, on && styles.intentTextOn]}>{h}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={styles.label}>MBTI</Text>
+        <Text style={styles.hint}>Optional. Tap to set, tap again to clear.</Text>
+        <View style={styles.chips}>
+          {MBTI_TYPES.map((t) => {
+            const on = draft.mbti === t;
+            return (
+              <Pressable
+                key={t}
+                onPress={() => onChange({ mbti: on ? undefined : t })}
+                accessibilityRole="button"
+                accessibilityState={{ selected: on }}
+                style={[styles.intentChip, on && styles.intentChipOn]}
+              >
+                <Text style={[styles.intentText, on && styles.intentTextOn]}>{t}</Text>
               </Pressable>
             );
           })}

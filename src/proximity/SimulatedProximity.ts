@@ -1,4 +1,5 @@
 import { INTENT_ORDER, IntentTag } from '../intents';
+import { HOBBIES, MBTI_TYPES } from '../personal';
 import { RangingEngine, RangingSample, RangingTech } from '../ranging';
 import { colors } from '../theme';
 import { MatchReveal, MyProfile, NearbyPeer, SocialHandle, SocialPlatform } from '../types';
@@ -94,6 +95,16 @@ function makeIntents(): IntentTag[] {
   return shuffled.slice(0, 1 + Math.floor(Math.random() * 2));
 }
 
+// 2–3 hobbies, and most people share an MBTI — consented personal context.
+function makeHobbies(): string[] {
+  const shuffled = [...HOBBIES].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
+}
+
+function makeMbti(): string | undefined {
+  return Math.random() < 0.75 ? MBTI_TYPES[Math.floor(Math.random() * MBTI_TYPES.length)] : undefined;
+}
+
 function makeHandles(name: string): SocialHandle[] {
   const lower = name.toLowerCase();
   const shuffled = [...PLATFORM_POOL].sort(() => Math.random() - 0.5);
@@ -133,6 +144,8 @@ function makeSimPeer(): SimPeer {
       bio: pick(BIOS),
       verified: Math.random() < 0.6, // ~60% of demo people are verified
       intents: makeIntents(),
+      hobbies: makeHobbies(),
+      mbti: makeMbti(),
       bearing: Math.floor(Math.random() * 360),
       distanceM: trueDistanceM,
       closeness: closenessFor(trueDistanceM),

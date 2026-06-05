@@ -184,6 +184,7 @@ function placeholderResolver(ephemeralId: string): NearbyPeer {
     displayName: `Nearby ${short}`,
     verified: false,
     intents: [],
+    hobbies: [],
     alias: `Nearby ${short}`,
     avatar: { emoji: '📡', color: '#0A84FF' },
     bio: '',

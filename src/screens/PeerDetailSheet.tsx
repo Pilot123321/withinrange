@@ -62,6 +62,21 @@ export function PeerDetailSheet({
             </View>
           )}
 
+          {(peer.mbti || peer.hobbies.length > 0) && (
+            <View style={styles.intentRow}>
+              {!!peer.mbti && (
+                <View style={[styles.intentChip, styles.mbtiChip]}>
+                  <Text style={styles.mbtiText}>{peer.mbti}</Text>
+                </View>
+              )}
+              {peer.hobbies.map((h) => (
+                <View key={h} style={styles.intentChip}>
+                  <Text style={styles.intentText}>{h}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
           {matched ? (
             <>
               <Text style={styles.matched}>✅ Connected</Text>
@@ -121,6 +136,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.md,
   },
   intentText: { fontSize: font.small, fontWeight: '600', color: colors.text },
+  mbtiChip: { backgroundColor: colors.accent },
+  mbtiText: { fontSize: font.small, fontWeight: '800', color: colors.primaryText, letterSpacing: 0.5 },
   matched: { fontSize: font.body, fontWeight: '600', color: colors.success, textAlign: 'center' },
   btn: { alignSelf: 'stretch' },
   sentPill: {

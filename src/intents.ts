@@ -4,7 +4,6 @@
 export type IntentTag =
   | 'hiring'
   | 'job'
-  | 'cofounder'
   | 'collab'
   | 'investing'
   | 'mentor'
@@ -14,7 +13,6 @@ export type IntentTag =
 export const INTENTS: Record<IntentTag, { label: string; emoji: string }> = {
   hiring: { label: 'Hiring', emoji: '🧑‍💼' },
   job: { label: 'Job hunting', emoji: '🔍' },
-  cofounder: { label: 'Co-founder', emoji: '🚀' },
   collab: { label: 'Collaborators', emoji: '🤝' },
   investing: { label: 'Investing', emoji: '💸' },
   mentor: { label: 'Mentoring', emoji: '🧭' },
@@ -25,10 +23,12 @@ export const INTENTS: Record<IntentTag, { label: string; emoji: string }> = {
 export const INTENT_ORDER: IntentTag[] = [
   'hiring',
   'job',
-  'cofounder',
   'collab',
   'investing',
   'mentor',
   'friends',
   'exploring',
 ];
+
+// Known intent keys, for filtering out stale/removed tags from saved data.
+export const INTENT_KEYS = new Set<string>(INTENT_ORDER);

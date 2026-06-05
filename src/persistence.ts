@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { INTENT_KEYS } from './intents';
 import { AppState } from './store';
 
 // Local, on-device persistence (AsyncStorage). We only persist the durable parts
@@ -33,7 +34,9 @@ function migrate(data: PersistedState): PersistedState {
   const profile = data.profile
     ? ((): PersistedState['profile'] => {
         const p = withHandles(data.profile as never) as Record<string, unknown>;
-        if (!Array.isArray(p.intents)) p.intents = []; // added after handles
+        // Drop removed/unknown intents (e.g. the retired 'cofounder').
+        p.intents = Array.isArray(p.intents) ? (p.intents as string[]).filter((t) => INTENT_KEYS.has(t)) : [];
+        if (!Array.isArray(p.hobbies)) p.hobbies = []; // added later
         return p as never;
       })()
     : data.profile;
