@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { AuroraBackground } from './src/components/AuroraBackground';
 import { TabBar, TabKey } from './src/components/TabBar';
 import { loadPersisted, savePersisted } from './src/persistence';
 import { createProvider } from './src/proximity/createProvider';
@@ -71,8 +72,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StoreContext.Provider value={store}>
+        <AuroraBackground />
         <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
-          <StatusBar style="dark" />
+          <StatusBar style="light" />
         {state.phase === 'loading' ? (
           <View style={styles.splash}>
             <ActivityIndicator color={colors.primary} />
@@ -129,7 +131,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg },
+  root: { flex: 1, backgroundColor: 'transparent' }, // aurora shows through
   flex: { flex: 1 },
   splash: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

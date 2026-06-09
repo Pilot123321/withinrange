@@ -86,7 +86,8 @@ export function NetworkGraph({
                 rx={rxMax * f}
                 ry={ryMax * f}
                 stroke={colors.border}
-                strokeWidth={1}
+                strokeWidth={1.25}
+                strokeOpacity={0.8}
                 fill="none"
               />
             ))}
@@ -117,11 +118,11 @@ export function NetworkGraph({
                 y1={cy}
                 x2={x}
                 y2={y}
-                stroke={sent ? colors.primary : colors.textSoft}
-                strokeWidth={sent ? 2.5 : 1.5}
+                stroke={sent ? colors.primary : colors.border}
+                strokeWidth={sent ? 2.5 : 1.75}
                 strokeDasharray={[2, 6]}
                 strokeDashoffset={dashOffset}
-                opacity={sent ? 0.9 : 0.5}
+                opacity={sent ? 0.95 : 0.85}
               />
             ))}
           </Svg>

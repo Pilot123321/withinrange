@@ -12,8 +12,9 @@ const TABS: TabDef[] = [
   { key: 'matches', label: 'Connections', icon: 'people-outline', activeIcon: 'people' },
 ];
 
-// iOS-style bottom tab bar: hairline top separator, icon + caption, tinted when
-// active, with a badge on Matches for new connections. Clears the home indicator.
+// Material 3 navigation bar: a pill-shaped active indicator slides behind the
+// active icon, with icon + label below, and a badge on Connections for new
+// matches. Clears the system navigation/home inset.
 export function TabBar({
   active,
   onChange,
@@ -38,8 +39,8 @@ export function TabBar({
             accessibilityState={{ selected: isActive }}
             accessibilityLabel={`${t.label}${t.key === 'matches' && matchCount ? `, ${matchCount} connections` : ''}`}
           >
-            <View>
-              <Ionicons name={isActive ? t.activeIcon : t.icon} size={26} color={tint} />
+            <View style={[styles.indicator, isActive && styles.indicatorActive]}>
+              <Ionicons name={isActive ? t.activeIcon : t.icon} size={24} color={tint} />
               {t.key === 'matches' && matchCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{matchCount}</Text>
@@ -62,12 +63,22 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
     paddingTop: space.sm,
   },
-  tab: { flex: 1, alignItems: 'center', gap: 2 },
-  label: { fontSize: 11, fontWeight: '600' },
+  tab: { flex: 1, alignItems: 'center', gap: 4 },
+  // M3 active-indicator pill that sits behind the icon.
+  indicator: {
+    minWidth: 64,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  indicatorActive: { backgroundColor: colors.surfaceAlt },
+  label: { fontSize: 12, fontWeight: '600' },
   badge: {
     position: 'absolute',
-    top: -4,
-    right: -10,
+    top: -2,
+    right: 8,
     minWidth: 18,
     height: 18,
     borderRadius: 9,
