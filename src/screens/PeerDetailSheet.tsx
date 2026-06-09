@@ -8,14 +8,16 @@ import { SafetyMenu } from '../components/SafetyMenu';
 import { Sheet } from '../components/Sheet';
 import { VerifiedBadge } from '../components/VerifiedBadge';
 import { INTENTS } from '../intents';
+import { commonGround, sharedHobbies } from '../personal';
 import { colors, font, radius, space } from '../theme';
-import { closenessLabel, MatchReveal, NearbyPeer } from '../types';
+import { closenessLabel, MatchReveal, MyProfile, NearbyPeer } from '../types';
 
 // Tapping a node opens this. You see who they are + their vibe, and can send a
 // private hi. Direction-finding is only offered AFTER a mutual match — pointing
 // an arrow at someone who hasn't consented would be a stalking tool.
 export function PeerDetailSheet({
   peer,
+  me,
   sent,
   matched,
   onSayHi,
@@ -25,6 +27,7 @@ export function PeerDetailSheet({
   onClose,
 }: {
   peer: NearbyPeer | null;
+  me: MyProfile;
   sent: boolean;
   matched: MatchReveal | null;
   onSayHi: () => void;
@@ -34,6 +37,10 @@ export function PeerDetailSheet({
   onClose: () => void;
 }) {
   const [safety, setSafety] = useState(false);
+
+  // Consented common ground — the spark. Only from context both people shared.
+  const shared = peer ? new Set(sharedHobbies(me.hobbies, peer.hobbies)) : new Set<string>();
+  const common = peer ? commonGround(me, peer) : [];
 
   return (
     <Sheet visible={!!peer} onClose={onClose}>
@@ -49,6 +56,13 @@ export function PeerDetailSheet({
             <Text style={styles.closeness}>{closenessLabel[peer.closeness]}</Text>
           </View>
           {!!peer.bio && <Text style={styles.bio}>{peer.bio}</Text>}
+
+          {common.length > 0 && (
+            <View style={styles.common}>
+              <Text style={styles.commonTitle}>✨ You both share</Text>
+              <Text style={styles.commonText}>{common.join('  ·  ')}</Text>
+            </View>
+          )}
 
           {peer.intents.length > 0 && (
             <View style={styles.intentRow}>
@@ -69,11 +83,16 @@ export function PeerDetailSheet({
                   <Text style={styles.mbtiText}>{peer.mbti}</Text>
                 </View>
               )}
-              {peer.hobbies.map((h) => (
-                <View key={h} style={styles.intentChip}>
-                  <Text style={styles.intentText}>{h}</Text>
-                </View>
-              ))}
+              {peer.hobbies.map((h) => {
+                const isShared = shared.has(h);
+                return (
+                  <View key={h} style={[styles.intentChip, isShared && styles.sharedChip]}>
+                    <Text style={[styles.intentText, isShared && styles.sharedText]}>
+                      {isShared ? `✦ ${h}` : h}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
           )}
 
@@ -136,6 +155,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.md,
   },
   intentText: { fontSize: font.small, fontWeight: '600', color: colors.text },
+  // The consented "common ground" highlight — the reason to say hi.
+  common: {
+    alignSelf: 'stretch',
+    backgroundColor: colors.surfaceAlt,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: radius.md,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.md,
+    alignItems: 'center',
+    gap: 2,
+  },
+  commonTitle: { fontSize: font.small, fontWeight: '700', color: colors.primary },
+  commonText: { fontSize: font.body, fontWeight: '700', color: colors.text, textAlign: 'center' },
+  sharedChip: { backgroundColor: colors.primary },
+  sharedText: { color: colors.primaryText, fontWeight: '800' },
   mbtiChip: { backgroundColor: colors.accent },
   mbtiText: { fontSize: font.small, fontWeight: '800', color: colors.primaryText, letterSpacing: 0.5 },
   matched: { fontSize: font.body, fontWeight: '600', color: colors.success, textAlign: 'center' },

@@ -117,6 +117,7 @@ export function NearbyScreen({ onSayHi }: { onSayHi: (peerId: string) => void })
 
       <PeerDetailSheet
         peer={selectedLive}
+        me={profile}
         sent={!!selectedLive && sentHellos.includes(selectedLive.id)}
         matched={selectedLive ? matchedFor(selectedLive.id) : null}
         onSayHi={() => selectedLive && onSayHi(selectedLive.id)}
